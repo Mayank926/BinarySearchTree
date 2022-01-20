@@ -4,8 +4,10 @@ import java.util.Scanner;
 
 public class BinarySearchTree {
     public static void main(String[] args) {
+        System.out.println("Enter number of elements to create BST");
         Scanner sc = new Scanner(System.in);
         int n = sc.nextInt();
+        System.out.println("Enter elements in one line separated by spaces and hit enter to insert");
         BSTNode root = new BSTNode(sc.nextInt());
         while (--n > 0) {
             insert(root, sc.nextInt());
@@ -19,82 +21,59 @@ public class BinarySearchTree {
             int key = sc.nextInt();
             System.out.println(key + " present in BST : " + (searchTree(root, key) != null));
         }
-        System.out.println(" Now provide number of elements to be deleted, should be less than " + n);
+        System.out.println(" Now provide number of elements to be deleted");
         t = sc.nextInt();
         while (t-- > 0) {
             System.out.println(" Enter element to be deleted");
             int key = sc.nextInt();
-            System.out.println(key + " deleted " + delete(root, key));
+            root= delete(root, key);
+            System.out.println(key + " deleted " );
             inOrderTraverse(root);
         }
     }
 
-    private static boolean delete(BSTNode root, int key) {
-        BSTNode nodeToBeDeleted = searchTree(root, key);
-        if (nodeToBeDeleted == null)
-            return false;
-
-        if (nodeToBeDeleted.left == null && nodeToBeDeleted.right == null) {
-            BSTNode parent = getParent(root, key);
-            ChildDirection direction;
-            if (parent.left!=null && (parent.left).data == key) {
-                nodeToBeDeleted = parent.left;
-                direction = ChildDirection.LEFT;
-            } else {
-                nodeToBeDeleted = parent.right;
-                direction = ChildDirection.RIGHT;
+    private static BSTNode delete(BSTNode root, int key){
+        if(root==null)
+            return null;
+        if(root.data==key) {
+            if(root.left==null&& root.right==null)
+                return null;
+            else if(root.right==null ){
+                return root.left;
+            }else if(root.left==null ){
+                return root.right;
+            }else{
+                BSTNode parentToSuccessor=findSmallestLeftChild(root.right);
+                if(parentToSuccessor==null) {
+                    root.data=(root.right).data;
+                    root.right=(root.right).right;
+                    return root;
+                }
+                root.data = (parentToSuccessor.left).data;
+                parentToSuccessor.left=(parentToSuccessor.left).right;
+                return root;
             }
-            if ((direction == ChildDirection.LEFT)) {
-                parent.left = null;
-            } else {
-                parent.right = null;
-            }
-            return true;
-        } else if (nodeToBeDeleted.left == null || nodeToBeDeleted.right == null) {
-            if (nodeToBeDeleted.left == null) {
-                nodeToBeDeleted.data = (nodeToBeDeleted.right).data;
-                nodeToBeDeleted.right = null;
-            } else {
-                nodeToBeDeleted.data = (nodeToBeDeleted.left).data;
-                nodeToBeDeleted.left = null;
-            }
-            return true;
-        } else {
-            BSTNode parentToInorderSuccessor = findParentToInOrderSuccessor(nodeToBeDeleted);
-            BSTNode inorderSuccessor;
-            if (parentToInorderSuccessor == nodeToBeDeleted) {
-                inorderSuccessor = parentToInorderSuccessor.right;
-                nodeToBeDeleted.data = inorderSuccessor.data;
-                nodeToBeDeleted.right = inorderSuccessor.right;
-            } else {
-                inorderSuccessor = parentToInorderSuccessor.left;
-                nodeToBeDeleted.data = inorderSuccessor.data;
-                parentToInorderSuccessor.left = inorderSuccessor.right;
-            }
-            return true;
         }
-    }
-
-    private static BSTNode findParentToInOrderSuccessor(BSTNode nodeToBeDeleted) {
-        BSTNode parentNode = nodeToBeDeleted.right;
-        if (parentNode.left == null)
-            return nodeToBeDeleted;
-        else {
-            while ((parentNode.left).left != null)
-                parentNode = parentNode.left;
-            return parentNode;
-        }
-    }
-
-    private static BSTNode getParent(BSTNode root, int key) {
-        if((root.right!=null && (root.right).data == key) || (root.left!=null && (root.left).data == key))
+        else if(key> root.data){
+            root.right= delete(root.right,key);
             return root;
-        else if (key > root.data)
-            return getParent(root.right, key);
-        else
-            return getParent(root.left, key);
+        }else{
+            root.left= delete(root.left,key);
+            return root;
+        }
     }
 
+    private static BSTNode findSmallestLeftChild(BSTNode root){
+        BSTNode parent;
+        if(root.left==null)
+            return  null;
+        if((root.left).left==null)
+            return root;
+        else{
+            parent=findSmallestLeftChild(root.left);
+            return parent;
+        }
+    }
 
     private static BSTNode searchTree(BSTNode root, int key) {
         BSTNode result = null;
@@ -129,11 +108,6 @@ public class BinarySearchTree {
         }
         return root;
     }
-}
-
-enum ChildDirection {
-    LEFT,
-    RIGHT
 }
 
 class BSTNode {
