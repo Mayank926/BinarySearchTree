@@ -14,6 +14,9 @@ public class BinarySearchTree {
         }
         System.out.println(" BST created and root is having data " + root.data);
         inOrderTraverse(root);
+        stack = new ArrayDeque<>();
+        System.out.println(" BST Inorder traversal using stack (no recursion)");
+        inOrderNonRecursive(root);
         System.out.println("Provide number of search cases ");
         int t = sc.nextInt();
         while (t-- > 0) {
@@ -95,6 +98,30 @@ public class BinarySearchTree {
             inOrderTraverse(root.left);
             System.out.println(" " + root.data);
             inOrderTraverse(root.right);
+        }
+    }
+    
+    private static void inOrderNonRecursive(BSTNode root) {
+        if (root != null) {
+            if (stack.isEmpty()) {
+                stack.push(root);
+                while (root.left != null) {
+                    stack.push(root.left);
+                    root = root.left;
+                }
+            }
+            while (!stack.isEmpty()) {
+                BSTNode cur = stack.pop();
+                System.out.print(" " + cur.data);
+                if (cur.right != null) {
+                    BSTNode temp = cur.right;
+                    stack.push(temp);
+                    while(temp.left!=null) {
+                        stack.push(temp.left);
+                        temp=temp.left;
+                    }
+                }
+            }
         }
     }
 
